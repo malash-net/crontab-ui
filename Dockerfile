@@ -10,6 +10,9 @@ RUN  apt-get update && apt-get install -y \
   jq \
   cron \
   && rm -rf /var/lib/apt/lists/*
+RUN rm -rf /etc/localtime \
+  && ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+  && dpkg-reconfigure -f noninteractive tzdata
 
 ENV NODE_VERSION=16.20.0
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
@@ -33,11 +36,8 @@ COPY . /crontab-ui
 RUN npm install
 
 ENV HOST 0.0.0.0
-
 ENV PORT 8000
-
 ENV   CRON_IN_DOCKER true
-
 EXPOSE $PORT
 
 CMD ["supervisord", "-c", "/etc/supervisord.conf"]
